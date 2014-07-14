@@ -104,4 +104,4 @@ colnames(output) <- featureDescriptiveNames
 #####################################################################################
 
 
-write.table(output, file="output.csv", sep=",", row.names=FALSE, col.names=TRUE)
+write.table(output, file="output.txt", sep=",", row.names=FALSE, col.names=TRUE)

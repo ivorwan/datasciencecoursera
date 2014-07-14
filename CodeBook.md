@@ -4,9 +4,9 @@ Course Project Code Book
 ### Code Book
 
 This codebook explains run_analysis.R, the solution file for the Course Project for Getting and Cleaning Data class available at Coursera.
-The script will generate a "tidy data" file, named output.csv
+The script will generate a "tidy data" file, named output.txt (which is comma delmited)
 
-output.csv will have the following columns:
+output.txt will have the following columns:
 
     1. "ActivityId"                                                  
     2. "SubjectId"                                                   

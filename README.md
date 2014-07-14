@@ -1,4 +1,6 @@
-datasciencecoursera
+Read Me
 ===================
 
-datasciencecoursera
+There is only one script.
+
+run_analysis.R

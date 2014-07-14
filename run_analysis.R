@@ -44,12 +44,9 @@ features <- read.table("./UCI HAR Dataset/features.txt")
 # 561 x 2
 
 activityLabels <- read.table("./UCI HAR Dataset/activity_labels.txt")
-activityLabels$V2 = factor(c("Walking", "WalkingUpstairs", "WalkingDownstairs", "Sitting", "Standing", "Laying"))
+colnames(activityLabels) <- c("ActivityId", "ActivityDescription")
 # dim(activityLabels)
 # 6 x 2
-
-
-grep("(mean|std)", features)
 
 
 #####################################################################################
@@ -62,85 +59,49 @@ mergedx <- rbind(xtrain, xtest)
 # selects only measurements with mean and avg, by applying regex
 
 mergedx <- mergedx[,grep("mean\\(|std\\(", features$V2)]
+colnames(mergedx) <- grep("mean\\(|std\\(", features$V2)
+colnames(mergedx) <- features[grep("mean\\(|std\\(", features$V2),2]
+
 mergedsubject <- rbind(subjecttrain, subjecttest)
+colnames(mergedsubject) <- "SubjectId"
+
 mergedy <- rbind(ytrain, ytest)
+colnames(mergedy) <- "ActivityId"
 
 mergedData <- cbind(mergedsubject, mergedy, mergedx)
 
-featureDescriptiveNames <- c("SubjectId",
-                             "ActivityId",
-                             "BodyAccelerationMeanTimeOnX",
-                             "BodyAccelerationMeanTimeOnY",
-                             "BodyAccelerationMeanTimeOnZ",
-                             "BodyAccelerationStandardDeviationTimeOnX",
-                             "BodyAccelerationStandardDeviationTimeOnY",
-                             "BodyAccelerationStandardDeviationTimeOnZ",
-                             "GravityAccelerationMeanTimeOnX",
-                             "GravityAccelerationMeanTimeOnY",
-                             "GravityAccelerationMeanTimeOnZ",
-                             "GravityAccelerationStandardDeviationTimeOnX",
-                             "GravityAccelerationStandardDeviationTimeOnY",
-                             "GravityAccelerationStandardDeviationTimeOnZ",
-                             "BodyAccelerationJerkMeanTimeOnX",
-                             "BodyAccelerationJerkMeanTimeOnY",
-                             "BodyAccelerationJerkMeanTimeOnZ",
-                             "BodyAccelerationJerkStandardDeviationTimeOnX",
-                             "BodyAccelerationJerkStandardDeviationTimeOnY",
-                             "BodyAccelerationJerkStandardDeviationTimeOnZ",
-                             "BodyGyroscopeVelocityMeanTimeOnX",
-                             "BodyGyroscopeVelocityMeanTimeOnY",
-                             "BodyGyroscopeVelocityMeanTimeOnZ",
-                             "BodyGyroscopeVelocityStandardDeviationTimeOnX",
-                             "BodyGyroscopeVelocityStandardDeviationTimeOnY",
-                             "BodyGyroscopeVelocityStandardDeviationTimeOnZ",
-                             "BodyGyroscopeVelocityJerkMeanTimeOnX",
-                             "BodyGyroscopeVelocityJerkMeanTimeOnY",
-                             "BodyGyroscopeVelocityJerkMeanTimeOnZ",
-                             "BodyGyroscopeVelocityStandardDeviationJerkTimeOnX",
-                             "BodyGyroscopeVelocityStandardDeviationJerkTimeOnY",
-                             "BodyGyroscopeVelocityStandardDeviationJerkTimeOnZ",
-                             "BodyAccelerationMagnitudeMeanTime",
-                             "BodyAccelerationMagnitudeStandardDeviationTime",
-                             "GravityAccelerationMagnitudeMeanTime",
-                             "GravityAccelerationMagnitudeStandardDeviationTime",
-                             "BodyAccelerationMagnitudeJerkMeanTime",
-                             "BodyAccelerationMagnitudeJerkStandardDeviationTime",
-                             "BodyGyroscopeVelocityMagnitudeMeanTime",
-                             "BodyGyroscopeVelocityMagnitudeStandardDeviationTime",
-                             "BodyGyroscopeVelocityMagnitudeJerkMeanTime",
-                             "BodyGyroscopeVelocityMagnitudeJerkStandardDeviationTime",
-                             "BodyAccelerationMeanFrequencyOnX",
-                             "BodyAccelerationMeanFrequencyOnY",
-                             "BodyAccelerationMeanFrequencyOnZ",
-                             "BodyAccelerationStandardDeviationFrequencyOnX",
-                             "BodyAccelerationStandardDeviationFrequencyOnY",
-                             "BodyAccelerationStandardDeviationFrequencyOnZ",
-                             "BodyAccelerationJerkMeanFrequencyOnX",
-                             "BodyAccelerationJerkMeanFrequencyOnY",
-                             "BodyAccelerationJerkMeanFrequencyOnZ",
-                             "BodyAccelerationJerkStandardDeviationFrequencyOnX",
-                             "BodyAccelerationJerkStandardDeviationFrequencyOnY",
-                             "BodyAccelerationJerkStandardDeviationFrequencyOnZ",
-                             "BodyGyroscopeVelocityMeanFrequencyOnX",
-                             "BodyGyroscopeVelocityMeanFrequencyOnY",
-                             "BodyGyroscopeVelocityMeanFrequencyOnZ",
-                             "BodyGyroscopeVelocityStandardDeviationFrequencyOnX",
-                             "BodyGyroscopeVelocityStandardDeviationFrequencyOnY",
-                             "BodyGyroscopeVelocityStandardDeviationFrequencyOnZ",
-                             "BodyAccelerationMagnitudeMeanFrequency",
-                             "BodyAccelerationMagnitudeStandardDeviationFrequency",
-                             "BodyAccelerationMagnitudeJerkMeanFrequency",
-                             "BodyAccelerationMagnitudeJerkStandardDeviationFrequency",
-                             "BodyGyroscopeVelocityMagnitudeMeanFrequency",
-                             "BodyGyroscopeVelocityMagnitudeStandardDeviationFrequency",
-                             "BodyGyroscopeVelocityMagnitudeJerkMeanFrequency",
-                             "BodyGyroscopeVelocityMagnitudeJerkStandardDeviationFrequency")
-                                 
-colnames(mergedData) <- featureDescriptiveNames
+output <- merge(mergedData, activityLabels, by.x = "ActivityId", by.y = "ActivityId", all=FALSE)
+
+#####################################################################################
+# Descriptive Names
+#####################################################################################
+
+featureDescriptiveNames <- names(output)
 
 
-activityLabels
 
-mergedData <- merge(mergedData, activitylabels, by.x = "ActivityId", by.y = "V2", all=FALSE)
+featureDescriptiveNames <- sapply(featureDescriptiveNames, function(x) if(substr(x, 1, 1) == "f") { sub("f", "Frequency", x)} else {x})
+featureDescriptiveNames <- sapply(featureDescriptiveNames, function(x) if(substr(x, 1, 1) == "t") { sub("t", "Time", x)} else {x})
+
+featureDescriptiveNames <- sub("Acc", "Acceleration", featureDescriptiveNames)
+featureDescriptiveNames <- sub("Gyro", "GyroscopeVelocity", featureDescriptiveNames)
+
+featureDescriptiveNames <- sub("Mag", "Magnitude", featureDescriptiveNames)
 
 
+
+featureDescriptiveNames <- sub("mean\\(\\)", "Mean", featureDescriptiveNames)
+featureDescriptiveNames <- sub("std\\(\\)", "StandardDeviation", featureDescriptiveNames)
+
+featureDescriptiveNames <- sub("-", "", featureDescriptiveNames)
+featureDescriptiveNames <- sub("BodyBody", "Body", featureDescriptiveNames)
+
+
+colnames(output) <- featureDescriptiveNames
+
+#####################################################################################
+# Generates File
+#####################################################################################
+
+
+write.table(output, file="output.csv", sep=",", row.names=FALSE, col.names=TRUE)
